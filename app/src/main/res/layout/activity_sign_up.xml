@@ -17,8 +17,31 @@
             android:layout_height="wrap_content"
             android:text="create new account" />
 
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_20sdp">
+            <com.makeramen.roundedimageview.RoundedImageView
+                android:id="@+id/imageProfile"
+                android:layout_width="@dimen/_80sdp"
+                android:layout_height="@dimen/_80sdp"
+                android:background="@drawable/background_image"
+                ></com.makeramen.roundedimageview.RoundedImageView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="add_image"
+                android:textColor="@color/secondary_text"
+                android:textSize="@dimen/_10ssp"
+
+
+        </FrameLayout>
+
+
         <EditText
-            android:id="@+id/editTextTextPersonName"
+            android:id="@+id/inputName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -26,7 +49,7 @@
             android:text="Name" />
 
         <EditText
-            android:id="@+id/editTextTextEmailAddress2"
+            android:id="@+id/inputEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -34,7 +57,7 @@
             android:inputType="textEmailAddress" />
 
         <EditText
-            android:id="@+id/editTextTextPassword2"
+            android:id="@+id/inputPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -42,7 +65,7 @@
             android:inputType="textPassword" />
 
         <EditText
-            android:id="@+id/editTextTextPassword3"
+            android:id="@+id/inputConfirmPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -50,15 +73,17 @@
             android:inputType="textPassword" />
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/buttonSignUp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="sign up" />
 
         <TextView
-            android:id="@+id/texttosignin"
+            android:id="@+id/textSignIn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="sign in" />
+
+
     </LinearLayout>
 </ScrollView>
