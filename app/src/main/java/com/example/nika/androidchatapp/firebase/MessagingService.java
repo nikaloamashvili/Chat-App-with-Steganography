@@ -1,8 +1,7 @@
 package com.example.nika.androidchatapp.firebase;
 
 import android.util.Log;
-import android.widget.Toast;
-import com.example.nika.androidchatapp.MainActivity;
+
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
