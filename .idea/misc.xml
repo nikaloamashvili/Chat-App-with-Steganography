@@ -3,6 +3,25 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Public/Documents/AndroidChatApp/Chat-App-with-Steganography/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1" />
+        <entry key="..\:/Users/Public/Documents/AndroidChatApp/Chat-App-with-Steganography/app/src/main/res/drawable/background_chat_input.xml" value="0.1" />
+        <entry key="..\:/Users/Public/Documents/AndroidChatApp/Chat-App-with-Steganography/app/src/main/res/drawable/background_content_bottom.xml" value="0.1" />
+        <entry key="..\:/Users/Public/Documents/AndroidChatApp/Chat-App-with-Steganography/app/src/main/res/drawable/background_content_top.xml" value="0.1" />
+        <entry key="..\:/Users/Public/Documents/AndroidChatApp/Chat-App-with-Steganography/app/src/main/res/drawable/background_icon.xml" value="0.1" />
+        <entry key="..\:/Users/Public/Documents/AndroidChatApp/Chat-App-with-Steganography/app/src/main/res/drawable/background_image.xml" value="0.1" />
+        <entry key="..\:/Users/Public/Documents/AndroidChatApp/Chat-App-with-Steganography/app/src/main/res/drawable/background_received_message.xml" value="0.1" />
+        <entry key="..\:/Users/Public/Documents/AndroidChatApp/Chat-App-with-Steganography/app/src/main/res/drawable/background_sent_message.xml" value="0.1" />
+        <entry key="..\:/Users/Public/Documents/AndroidChatApp/Chat-App-with-Steganography/app/src/main/res/drawable/ic_add.xml" value="0.1" />
+        <entry key="..\:/Users/Public/Documents/AndroidChatApp/Chat-App-with-Steganography/app/src/main/res/drawable/ic_launcher_background.xml" value="0.1" />
+        <entry key="..\:/Users/Public/Documents/AndroidChatApp/Chat-App-with-Steganography/app/src/main/res/drawable/ic_send.xml" value="0.1" />
+        <entry key="..\:/Users/Public/Documents/AndroidChatApp/Chat-App-with-Steganography/app/src/main/res/layout/activity_chat.xml" value="0.13677536231884058" />
+        <entry key="..\:/Users/Public/Documents/AndroidChatApp/Chat-App-with-Steganography/app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="..\:/Users/Public/Documents/AndroidChatApp/Chat-App-with-Steganography/app/src/main/res/layout/activity_sign_up.xml" value="0.10733695652173914" />
+        <entry key="..\:/Users/Public/Documents/AndroidChatApp/Chat-App-with-Steganography/app/src/main/res/layout/activity_signin.xml" value="0.1" />
+        <entry key="..\:/Users/Public/Documents/AndroidChatApp/Chat-App-with-Steganography/app/src/main/res/layout/activity_users.xml" value="0.13677536231884058" />
+        <entry key="..\:/Users/Public/Documents/AndroidChatApp/Chat-App-with-Steganography/app/src/main/res/layout/item_container_received_message.xml" value="0.13677536231884058" />
+        <entry key="..\:/Users/Public/Documents/AndroidChatApp/Chat-App-with-Steganography/app/src/main/res/layout/item_container_sent_message.xml" value="0.13677536231884058" />
+        <entry key="..\:/Users/Public/Documents/AndroidChatApp/Chat-App-with-Steganography/app/src/main/res/layout/item_container_user.xml" value="0.13677536231884058" />
         <entry key="..\:/Users/Public/Documents/AndroidChatApp/app/src/main/res/drawable/background_image.xml" value="0.1015625" />
         <entry key="..\:/Users/Public/Documents/AndroidChatApp/app/src/main/res/drawable/ic_launcher_background.xml" value="0.1" />
         <entry key="..\:/Users/Public/Documents/AndroidChatApp/app/src/main/res/layout/activity_main.xml" value="0.1" />
