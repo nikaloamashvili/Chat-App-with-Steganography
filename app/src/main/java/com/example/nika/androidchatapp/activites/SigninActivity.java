@@ -35,11 +35,11 @@ public class SigninActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         preferenceManager=new PreferenceManager(getApplicationContext());
         if (preferenceManager.getBoolean(Constants.Key_IS_SIGN_IN)){
+
             Intent intent = new Intent(getApplicationContext(),MainActivity.class);
             startActivity(intent);
             finish();
         }
-        //nika@gmail.com 123-9Hh
         binding =ActivitySigninBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setListeners();
@@ -53,7 +53,11 @@ public class SigninActivity extends AppCompatActivity {
                 signIn();
             }
         });
+        binding.TextForgetPassword.setOnClickListener(v->{
+            startActivity(new Intent(getApplicationContext(),ForgetPasswordActivity.class));
+        });
     }
+
     private void signIn(){
         loading(true);
         FirebaseFirestore database=FirebaseFirestore.getInstance();

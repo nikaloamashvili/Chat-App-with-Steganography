@@ -5,6 +5,9 @@ public class Constants {
     public static final String Key_NAME="name";
     public static final String Key_EMAIL="email";
     public static final String Key_PASSWORD="password";
+    public static final String Key_PASSWORD1="password1";
+    public static final String Key_PASSWORD2="password2";
+    public static final String KEY_PTIMESTAMP = "passwordtimestamp";
     public static final String Key_PREFERENCE_NAME ="charAppPreference";
     public static final String Key_IS_SIGN_IN="isSignedIn";
     public static final String Key_USER_ID="userId";

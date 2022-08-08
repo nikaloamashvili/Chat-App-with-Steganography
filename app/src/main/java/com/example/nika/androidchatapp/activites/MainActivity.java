@@ -24,10 +24,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 
 public class MainActivity extends BaseActivity implements ConversionListener {
@@ -45,6 +48,7 @@ public class MainActivity extends BaseActivity implements ConversionListener {
         setContentView(binding.getRoot());
         preferenceManager =new PreferenceManager(getApplicationContext());
         init();
+        passwordTime();
         loadUserDetails();
         getToken();
         setListeners();
@@ -58,7 +62,9 @@ public class MainActivity extends BaseActivity implements ConversionListener {
     }
 
     private void setListeners(){
-
+        binding.textView3.setOnClickListener(v->{
+            startActivity(new Intent(getApplicationContext(),ChangePasswordActivity.class));
+        });
         binding.imageSignOut.setOnClickListener(v -> signOut());
         binding.fabNewChat.setOnClickListener(v->startActivity(new Intent(getApplicationContext(),UsersActivity.class)));
 
@@ -82,6 +88,62 @@ public class MainActivity extends BaseActivity implements ConversionListener {
         database.collection(Constants.KEY_COLLECTION_CONVERSATIONS)
                 .whereEqualTo(Constants.KEY_RECEIVER_ID,preferenceManager.getString(Constants.Key_USER_ID))
                 .addSnapshotListener(eventListener);
+    }
+
+    private void passwordTime () {
+        String lastPassDate;
+        String thisDate;
+        String mlastPassDate;
+        String mthisDate;
+        String ylastPassDate;
+        String ythisDate;
+        Integer lPD=0;
+        Integer tD=0;
+        Integer ylPD=0;
+        Integer ytD=0;
+
+        lastPassDate=preferenceManager.getString(Constants.KEY_PTIMESTAMP);
+        thisDate=getReadableDateTime(new Date());
+
+
+        mlastPassDate=lastPassDate.substring(1,2);
+        mthisDate=thisDate.substring(1,2);
+
+        ylastPassDate=lastPassDate.substring(7,11);
+        ythisDate=thisDate.substring(7,11);
+
+        try{
+
+            lPD = Integer.parseInt(mlastPassDate);
+            tD = Integer.parseInt(mthisDate);
+            ylPD = Integer.parseInt(ylastPassDate);
+            ytD = Integer.parseInt(ythisDate);
+        }
+        catch (NumberFormatException ex){
+            showToast(ex.getMessage());
+        }
+
+        if((ytD-ylPD)>1){
+            showToast("You need to change the password!");
+            startActivity(new Intent(getApplicationContext(),ChangePasswordActivity.class));
+
+        }
+        else if((ytD==ylPD)){
+            if((tD-lPD)>=3){
+                showToast("You need to change the password!");
+                startActivity(new Intent(getApplicationContext(),ChangePasswordActivity.class));
+
+            }
+        }else if((((tD-12)*-1)-lPD)>=3){
+            showToast("You need to change the password!");
+            startActivity(new Intent(getApplicationContext(),ChangePasswordActivity.class));
+        }
+
+
+    }
+
+    private String getReadableDateTime(Date date){
+        return new SimpleDateFormat("MM dd, yyyy - hh:mm a", Locale.getDefault()).format(date);
     }
 
 

@@ -96,6 +96,8 @@ if(getItemViewType(position)==VIEW_TYPE_SENT){
             request.allowScanningByMediaScanner();
             request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_MOBILE | DownloadManager.Request.NETWORK_WIFI);
             downloadManager.enqueue(request);
+            Toast.makeText(l.getContext(),"downloading..." ,Toast.LENGTH_SHORT).show();
+
         });
     }
 

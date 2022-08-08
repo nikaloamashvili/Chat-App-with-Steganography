@@ -10,6 +10,15 @@
         android:supportsRtl="false"
         android:theme="@style/Theme.AndroidChatApp">
         <activity
+            android:name=".activites.SystemPasswordChangeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activites.ForgetPasswordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activites.ChangePasswordActivity"
+            android:exported="false" />
+        <activity
             android:name=".activites.popupActivity"
             android:exported="false" />
         <activity

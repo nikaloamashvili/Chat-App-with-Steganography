@@ -4,6 +4,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import at.favre.lib.crypto.bcrypt.BCrypt;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -30,7 +31,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.security.MessageDigest;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 
 public class SignUpActivity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
@@ -72,7 +77,12 @@ public class SignUpActivity extends AppCompatActivity {
         HashMap<String,Object> user=new HashMap<>();
         user.put(Constants.Key_NAME,binding.inputName.getText().toString());
         user.put(Constants.Key_EMAIL,binding.inputEmail.getText().toString());
-        //Buser.put(Constants.Key_PASSWORD,binding.inputPassword.getText().toString());
+        String bcryptHashString = BCrypt.withDefaults().hashToString(12, binding.inputPassword.getText().toString().trim().toCharArray());
+        user.put(Constants.Key_PASSWORD,bcryptHashString);
+        user.put(Constants.Key_PASSWORD1,"null");
+        user.put(Constants.Key_PASSWORD2,"null");
+        user.put(Constants.KEY_PTIMESTAMP, getReadableDateTime(new Date()));
+
         user.put(Constants.Key_IMAGE,encodedImage);
         firebaseAuth.createUserWithEmailAndPassword(binding.inputEmail.getText().toString(),binding.inputPassword.getText().toString())
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -88,6 +98,7 @@ public class SignUpActivity extends AppCompatActivity {
                                         preferenceManager.putString(Constants.Key_USER_ID,documentReference.getId());
                                         preferenceManager.putString(Constants.Key_NAME,binding.inputName.getText().toString());
                                         preferenceManager.putString(Constants.Key_IMAGE, encodedImage);
+                                        preferenceManager.putString(Constants.KEY_PTIMESTAMP,  getReadableDateTime(new Date()));
                                         Intent intent = new Intent(getApplicationContext(),MainActivity.class);
                                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                         startActivity(intent);
@@ -98,6 +109,10 @@ public class SignUpActivity extends AppCompatActivity {
                                         showToast(exception.getMessage());
                                     });
                         } else {
+                            task.addOnFailureListener(exception-> {
+                                loading(false);
+                                showToast(exception.getMessage());
+                            });
                             Toast.makeText(SignUpActivity.this,"reg faild!",Toast.LENGTH_LONG).show();
                         }
                     }
@@ -114,7 +129,6 @@ public class SignUpActivity extends AppCompatActivity {
         previewBitmap.compress(Bitmap.CompressFormat.JPEG,50,byteArrayOutputStream);
         byte [] bytes=byteArrayOutputStream.toByteArray();
         return Base64.encodeToString(bytes,Base64.DEFAULT);
-
     }
     private final ActivityResultLauncher<Intent> pickImage= registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -167,7 +181,7 @@ public class SignUpActivity extends AppCompatActivity {
             showToast("Week password to short, password must be 8 digits min");
             return false;
         }
-        else if (PasswordStrength(binding.inputPassword.getText().toString().trim())){
+        else if (!(PasswordStrength(binding.inputPassword.getText().toString().trim()))){
             showToast("Week password");
             return false;
         }
@@ -186,11 +200,15 @@ public class SignUpActivity extends AppCompatActivity {
         }
     }
 
+    private String getReadableDateTime(Date date){
+        return new SimpleDateFormat("MM dd, yyyy - hh:mm a", Locale.getDefault()).format(date);
+    }
+
     private Boolean PasswordStrength(String password){
+        int  upChars=0, lowChars=0;
+        int special=0, digits=0;
         for(int i=0; i<password.length(); i++)
         {
-            int  upChars=0, lowChars=0;
-            int special=0, digits=0;
             char ch = password.charAt(i);
             if(Character.isUpperCase(ch))
                 upChars++;
@@ -207,21 +225,60 @@ public class SignUpActivity extends AppCompatActivity {
                 }
                 else
                     special++;
-            }
-            if(upChars==0)
+            }}
+            if(upChars==0){
                 Toast.makeText(getApplicationContext(),"\nThe Password must contain at least one uppercase character.",Toast.LENGTH_LONG).show();
-            if(lowChars==0)
+                return false;
+            }
+            if(lowChars==0){
                 Toast.makeText(getApplicationContext(),"\nThe Password must contain at least one lowercase character.",Toast.LENGTH_LONG).show();
-            if(digits==0)
+                return false;
+            }
+            if(digits==0){
                 Toast.makeText(getApplicationContext(),"\nThe Password must contain at least one digit.",Toast.LENGTH_LONG).show();
-            if(special==0)
+                return false;
+            }
+            if(special==0){
                 Toast.makeText(getApplicationContext(),"\nThe Password must contain at least one special character.",Toast.LENGTH_LONG).show();
-
+                return false;
+            }
             if(upChars!=0 && lowChars!=0 && digits!=0 && special!=0) {
                 return true;
             } else{
                 return false;
             }
     }
-        return false;}
+
+    public static String sha256(String base) {
+        try{
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(base.getBytes("UTF-8"));
+            StringBuffer hexString = new StringBuffer();
+
+            for (int i = 0; i < hash.length; i++) {
+                String hex = Integer.toHexString(0xff & hash[i]);
+                if(hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+
+            return hexString.toString();
+        } catch(Exception ex){
+            throw new RuntimeException(ex);
+        }
     }
+
+
+
+//    private String generateHashedPass(String pass) {
+//        // hash a plaintext password using the typical log rounds (10)
+//        return BCrypt.hashpw(pass, BCrypt.gensalt());
+//    }
+//
+//    private boolean isValid(String clearTextPassword, String hashedPass) {
+//        // returns true if password matches hash
+//        return BCrypt.checkpw(clearTextPassword, hashedPass);
+//    }
+
+
+}
+

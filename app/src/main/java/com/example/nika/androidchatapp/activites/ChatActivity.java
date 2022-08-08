@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Base64;
@@ -55,6 +56,7 @@ import java.util.Objects;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import io.grpc.Context;
 
 
@@ -69,10 +71,11 @@ public class ChatActivity extends BaseActivity {
     private Boolean isReceiverAvailable = false;
     private String conversionId = null;
     private FirebaseStorage storage = FirebaseStorage.getInstance();
+    private int fileChose;
 
 
 
-
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -249,8 +252,6 @@ public class ChatActivity extends BaseActivity {
                 Constants.KEY_LAST_MESSAGE,message,
                 Constants.KEY_TIMESTAMP, new Date()
         );
-
-
     }
 
     private void checkForConversion () {
@@ -285,33 +286,30 @@ public class ChatActivity extends BaseActivity {
 
     };
 
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     private void setlistener(){
+
         binding.addphoto.setOnClickListener(v->{
-            LayoutInflater inflater = (LayoutInflater)
-                    getSystemService(LAYOUT_INFLATER_SERVICE);
-            View popupView = inflater.inflate(R.layout.popup_window, null);
+            fileChose=1;
+            Intent intent =new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            pickImage.launch(intent);
 
-            // create the popup window
-            int width = LinearLayout.LayoutParams.WRAP_CONTENT;
-            int height = LinearLayout.LayoutParams.WRAP_CONTENT;
-            boolean focusable = true; // lets taps outside the popup also dismiss it
-            final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+        });
 
-            // show the popup window
-            // which view you pass in doesn't matter, it is only used for the window tolken
-            popupWindow.showAtLocation(v, Gravity.CENTER, 0, 0);
+        binding.addaudio.setOnClickListener(v->{
+            fileChose=2;
+            Intent intent =new Intent(Intent.ACTION_PICK, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            pickImage.launch(intent);
 
-            // dismiss the popup window when touched
-            popupView.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    popupWindow.dismiss();
-                    return true;
-                }
-            });
-//            Intent intent =new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//            pickImage.launch(intent);
+        });
+
+        binding.addfile.setOnClickListener(v->{
+            fileChose=3;
+            Intent intent =new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            pickImage.launch(intent);
 
         });
     }
@@ -321,18 +319,11 @@ public class ChatActivity extends BaseActivity {
             result -> {
                 if (result.getResultCode()==RESULT_OK){
                     if (result.getData()!=null){
+                        showToast(result.getData().getClass().toString());
                         Uri imageUri=result.getData().getData();
                         try {
                             InputStream inputStream= getContentResolver().openInputStream(imageUri);
-
-
-
                             // inflate the layout of the popup window
-
-
-
-
-
                             ContentResolver cR = getBaseContext().getContentResolver();
                             MimeTypeMap mime = MimeTypeMap.getSingleton();
                             String type = mime.getExtensionFromMimeType(cR.getType(imageUri));
@@ -342,7 +333,14 @@ public class ChatActivity extends BaseActivity {
                             StorageReference mountainsRef = storageRef.child(imageUri.toString());
 
                             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                            if(fileChose==1){
+                                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+
+                            }else if(fileChose==2){
+
+                            }else {
+
+                            }
                             byte[] data = baos.toByteArray();
 
                             UploadTask uploadTask = mountainsRef.putBytes(data);
