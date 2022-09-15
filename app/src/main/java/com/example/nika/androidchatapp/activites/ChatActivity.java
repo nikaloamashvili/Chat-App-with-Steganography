@@ -9,20 +9,15 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Base64;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.MimeTypeMap;
-import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.Toast;
 
-import com.example.nika.androidchatapp.R;
 import com.example.nika.androidchatapp.adapters.ChatAdapter;
 import com.example.nika.androidchatapp.databinding.ActivityChatBinding;
 import com.example.nika.androidchatapp.models.ChatMessage;
 import com.example.nika.androidchatapp.models.User;
+import com.example.nika.androidchatapp.network.RetrieveFeedTask1;
 import com.example.nika.androidchatapp.utilities.Constants;
 import com.example.nika.androidchatapp.utilities.PreferenceManager;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -41,7 +36,6 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -52,12 +46,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-import io.grpc.Context;
 
 
 public class ChatActivity extends BaseActivity {
@@ -111,6 +105,9 @@ public class ChatActivity extends BaseActivity {
                     chatMessage.senderId =documentChange.getDocument().getString(Constants.KEY_SENDER_ID);
                     chatMessage.receiverId =documentChange.getDocument().getString(Constants.KEY_RECEIVER_ID);
                     chatMessage.message =documentChange.getDocument().getString(Constants.KEY_MESSAGE);
+                    chatMessage.hiddenText =documentChange.getDocument().getString(Constants.KEY_HIDDEN_TEXT);
+                    chatMessage.url =documentChange.getDocument().getString(Constants.KEY_URL);
+                    chatMessage.dataType =documentChange.getDocument().getString(Constants.KEY_DATA_TYPE);
                     chatMessage.dateTime =getReadableDateTime(documentChange.getDocument().getDate(Constants.KEY_TIMESTAMP));
                     chatMessage.dateObject =documentChange.getDocument().getDate(Constants.KEY_TIMESTAMP);
                     chatMessages.add(chatMessage);
@@ -185,6 +182,9 @@ public class ChatActivity extends BaseActivity {
         message.put(Constants.KEY_SENDER_ID,preferenceManger.getString(Constants.Key_USER_ID));
         message.put(Constants.KEY_RECEIVER_ID,receiverUser.id);
         message.put(Constants.KEY_MESSAGE,binding.inputMessage.getText().toString());
+        message.put(Constants.KEY_HIDDEN_TEXT,"null");
+        message.put(Constants.KEY_DATA_TYPE,"text");
+        message.put(Constants.KEY_URL,"null");
         message.put(Constants.KEY_TIMESTAMP,new Date());
         database.collection(Constants.KEY_COLLECTION_CHAT).add(message);
         if (conversionId != null) {
@@ -206,15 +206,18 @@ public class ChatActivity extends BaseActivity {
     }
 
 
-    private void sendMessage(String link){
+    private void sendMessage(String url,String type){
         HashMap<String,Object> message = new HashMap<>();
         message.put(Constants.KEY_SENDER_ID,preferenceManger.getString(Constants.Key_USER_ID));
         message.put(Constants.KEY_RECEIVER_ID,receiverUser.id);
-        message.put(Constants.KEY_MESSAGE,link);
+        message.put(Constants.KEY_MESSAGE,"you get a "+type+" file click me for open!");
+        message.put(Constants.KEY_HIDDEN_TEXT,"null");
+        message.put(Constants.KEY_DATA_TYPE,type);
+        message.put(Constants.KEY_URL,url);
         message.put(Constants.KEY_TIMESTAMP,new Date());
         database.collection(Constants.KEY_COLLECTION_CHAT).add(message);
         if (conversionId != null) {
-            updateConversion(link);
+            updateConversion("you get a "+type+" file click me for open!");
         }else {
             HashMap<String,Object> conversion = new HashMap<>();
             conversion.put(Constants.KEY_SENDER_ID,preferenceManger.getString(Constants.Key_USER_ID));
@@ -223,7 +226,7 @@ public class ChatActivity extends BaseActivity {
             conversion.put(Constants.KEY_RECEIVER_ID,receiverUser.id);
             conversion.put(Constants.KEY_RECEIVER_NAME,receiverUser.name);
             conversion.put(Constants.KEY_RECEIVER_IMAGE,receiverUser.image);
-            conversion.put(Constants.KEY_LAST_MESSAGE,link);
+            conversion.put(Constants.KEY_LAST_MESSAGE,"you get a "+type+" file click me for open!");
             conversion.put(Constants.KEY_TIMESTAMP,new Date());
             addConversion(conversion);
 
@@ -305,13 +308,28 @@ public class ChatActivity extends BaseActivity {
 
         });
 
-        binding.addfile.setOnClickListener(v->{
+        binding.addvideo.setOnClickListener(v->{
             fileChose=3;
             Intent intent =new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             pickImage.launch(intent);
 
         });
+
+
+        binding.addfile.setOnClickListener(v->{
+            fileChose=4;
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("application/msword");
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            startActivityForResult(intent, 12);
+            pickImage.launch(intent);
+
+        });
+
+
+
+
     }
 
     private final ActivityResultLauncher<Intent> pickImage= registerForActivityResult(
@@ -347,6 +365,7 @@ public class ChatActivity extends BaseActivity {
                             uploadTask.addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception exception) {
+                                    showToast("cccc");
                                     showToast(exception.toString());
                                     // Handle unsuccessful uploads
                                 }
@@ -363,18 +382,24 @@ public class ChatActivity extends BaseActivity {
                                 public void onComplete(@NonNull Task<Uri> task) {
                                     if (task.isSuccessful()) {
                                         Uri downloadUri = task.getResult();
-                                        sendMessage(downloadUri.toString()+"."+type);
-
+//                                        RetrieveFeedTask1 r = new RetrieveFeedTask1(downloadUri.toString());
+//                                        r.execute();
+//                                        try {
+//                                            TimeUnit.SECONDS.sleep(10);
+//                                        } catch (InterruptedException e) {
+//                                            e.printStackTrace();
+//                                        }
+                                        sendMessage(downloadUri.toString(),type);
+                                   //     showToast(r.Gethiddentext());
                                     } else {
                                         showToast("faild");
-
                                         // Handle failures
                                         // ...
                                     }}}).addOnFailureListener(l->{
+                                showToast("the problem d");
                                 showToast(l.toString());
-
+                                showToast("the problem u");
                             });
-
                         }catch (FileNotFoundException e){
                             e.printStackTrace();
                         }

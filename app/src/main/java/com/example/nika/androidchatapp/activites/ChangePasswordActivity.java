@@ -197,7 +197,6 @@ public class ChangePasswordActivity extends AppCompatActivity {
             {
                 if(ch=='<' || ch=='>')
                 {
-                    //System.out.println("\nThe Password is Malicious!");
                     return false;
                 }
                 else
